@@ -1,4 +1,319 @@
-svg{margin-top:-1px;margin-bottom:-1px;background-color:#f5f5f5}.main-banner{background-color:#0f1c2e;position:relative;height:60vh}.main-banner .container{height:100%;display:flex;align-items:center}.main-banner h1,.main-banner p{color:#fff}.my-work{background-color:#f5f5f5;position:relative;margin-top:-100px;padding-top:100px}.my-work a{color:#fff}.my-work .card{border-radius:5%;padding:15px;margin-bottom:60px;box-shadow:rgba(17,12,46,.15) 0px 48px 100px 0px;overflow:hidden;position:relative}.my-work .card .overlay-div p{display:none;color:#fff;padding:0 20px;font-size:18px;line-height:1.8}.my-work .card:hover .overlay-div{position:absolute;width:100%;height:100%;background-color:#0f1c2e;left:0;z-index:2;top:0;opacity:.9;display:flex;justify-content:center;align-items:center}.my-work .card:hover .overlay-div.more{cursor:pointer}.my-work .card:hover .overlay-div p{display:block}.my-work .card-img{background-size:cover;background-repeat:no-repeat;background-position:center;width:100%;min-height:180px;transition:transform .5s ease}@media(max-width: 768px){.my-work .card-img{min-height:230px}}.my-work .card-img.legal{background-image:url(c738f7a90c3a77f9108e.webp)}.my-work .card-img.hotel{background-image:url(5becb1ffe5918dd6103f.webp)}.my-work .card-img.ac{background-image:url(d95a26aac4b4257f0729.webp)}.my-work .card-img.rent-a-car{background-image:url(7bf7c0395c0f3565a957.webp)}.my-work .card-img.tourism{background-image:url(bd58c1f453713d392288.webp)}.my-work .card-img.placeholder{background-image:url(32fb4fe379307938c01d.webp)}.my-work .card-content{margin-top:30px}.my-work .card-content h3{font-size:18px}.main-footer{height:100px;background-color:#0f1c2e}.main-footer .copy{text-align:center;font-size:15px;color:#fff}.description-project .project-img{width:100%;height:auto}body{font-family:Arial,sans-serif;margin:0;padding:0;background-color:#f5f5f5;color:#333}*{margin:0;padding:0;box-sizing:border-box}h1,h2,h3,h4,h5,h6{font-family:"Playfair Display",serif;font-optical-sizing:auto;font-weight:400;font-style:normal}p,li{font-family:"Playfair Display",serif;font-optical-sizing:auto;font-weight:200;font-style:normal;margin-bottom:15px}h1{font-size:72px;line-height:1.2;margin-bottom:24px}@media(max-width: 1024px){h1{font-size:48px;line-height:1.3;margin-bottom:20px}}@media(max-width: 768px){h1{font-size:36px;line-height:1.4;margin-bottom:16px}}h2{font-size:60px;line-height:1.3;margin-bottom:20px}@media(max-width: 1024px){h2{font-size:40px;line-height:1.4;margin-bottom:18px}}@media(max-width: 768px){h2{font-size:30px;line-height:1.5;margin-bottom:14px}}h3{font-size:48px;line-height:1.4;margin-bottom:18px}@media(max-width: 1024px){h3{font-size:32px;line-height:1.5;margin-bottom:16px}}@media(max-width: 768px){h3{font-size:24px;line-height:1.6;margin-bottom:12px}}h4{font-size:36px;line-height:1.5;margin-bottom:16px}@media(max-width: 1024px){h4{font-size:28px;line-height:1.6;margin-bottom:14px}}@media(max-width: 768px){h4{font-size:20px;line-height:1.7;margin-bottom:10px}}h5{font-size:30px;line-height:1.6;margin-bottom:14px}@media(max-width: 1024px){h5{font-size:24px;line-height:1.7;margin-bottom:12px}}@media(max-width: 768px){h5{font-size:18px;line-height:1.8;margin-bottom:8px}}h6{font-size:24px;line-height:1.7;margin-bottom:12px}@media(max-width: 1024px){h6{font-size:20px;line-height:1.8;margin-bottom:10px}}@media(max-width: 768px){h6{font-size:16px;line-height:1.9;margin-bottom:6px}}p,li,span,a{font-size:24px;line-height:1.6}@media(max-width: 1024px){p,li,span,a{font-size:20px;line-height:1.7}}@media(max-width: 768px){p,li,span,a{font-size:18px;line-height:1.8}}.language-php span,.language-html span,.language-js span{font-size:initial;line-height:initial}
+/*!******************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[0].use[2]!./src/sass/style.scss ***!
+  \******************************************************************************************************************************************/
+svg {
+  margin-top: -1px;
+  margin-bottom: -1px;
+  background-color: #f5f5f5;
+}
+
+.main-banner {
+  background-color: #0f1c2e;
+  position: relative;
+  height: 60vh;
+}
+.main-banner .container {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+.main-banner h1,
+.main-banner p {
+  color: #ffffff;
+}
+.main-banner svg {
+  background-color: transparent;
+  width: 40px;
+  height: auto;
+  cursor: pointer;
+}
+
+.my-work {
+  background-color: #f5f5f5;
+  position: relative;
+  margin-top: -100px;
+  padding-top: 100px;
+}
+.my-work a {
+  color: #333;
+}
+.my-work .card {
+  border-radius: 5%;
+  padding: 15px;
+  margin-bottom: 60px;
+  box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
+  overflow: hidden;
+  position: relative;
+}
+.my-work .card .overlay-div p {
+  display: none;
+  color: #ffffff;
+  padding: 0 20px;
+  font-size: 18px;
+  line-height: 1.8;
+}
+.my-work .card:hover .overlay-div {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: #0f1c2e;
+  left: 0;
+  z-index: 2;
+  top: 0;
+  opacity: 0.9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.my-work .card:hover .overlay-div.more {
+  cursor: pointer;
+}
+.my-work .card:hover .overlay-div p {
+  display: block;
+}
+.my-work .card-img {
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 100%;
+  min-height: 180px;
+  transition: transform 0.5s ease;
+}
+@media (max-width: 768px) {
+  .my-work .card-img {
+    min-height: 230px;
+  }
+}
+.my-work .card-img.legal {
+  background-image: url(c738f7a90c3a77f9108e.webp);
+}
+.my-work .card-img.hotel {
+  background-image: url(5becb1ffe5918dd6103f.webp);
+}
+.my-work .card-img.ac {
+  background-image: url(d95a26aac4b4257f0729.webp);
+}
+.my-work .card-img.rent-a-car {
+  background-image: url(7bf7c0395c0f3565a957.webp);
+}
+.my-work .card-img.tourism {
+  background-image: url(bd58c1f453713d392288.webp);
+}
+.my-work .card-img.placeholder {
+  background-image: url(32fb4fe379307938c01d.webp);
+}
+.my-work .card-content {
+  margin-top: 30px;
+}
+.my-work .card-content h3 {
+  font-size: 18px;
+}
+
+.main-footer {
+  height: 100px;
+  background-color: #0f1c2e;
+}
+.main-footer .copy {
+  text-align: center;
+  font-size: 15px;
+  color: #ffffff;
+}
+
+.description-project .project-img {
+  width: 100%;
+  height: auto;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Playfair Display", serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+p,
+li {
+  font-family: "Playfair Display", serif;
+  font-optical-sizing: auto;
+  font-weight: 200;
+  font-style: normal;
+  margin-bottom: 15px;
+}
+
+h1 {
+  font-size: 62px;
+  line-height: 1.2;
+  margin-bottom: 24px;
+}
+@media (max-width: 1024px) {
+  h1 {
+    font-size: 38px;
+    line-height: 1.3;
+    margin-bottom: 20px;
+  }
+}
+@media (max-width: 768px) {
+  h1 {
+    font-size: 26px;
+    line-height: 1.4;
+    margin-bottom: 16px;
+  }
+}
+
+h2 {
+  font-size: 50px;
+  line-height: 1.3;
+  margin-bottom: 20px;
+}
+@media (max-width: 1024px) {
+  h2 {
+    font-size: 30px;
+    line-height: 1.4;
+    margin-bottom: 18px;
+  }
+}
+@media (max-width: 768px) {
+  h2 {
+    font-size: 20px;
+    line-height: 1.5;
+    margin-bottom: 14px;
+  }
+}
+
+h3 {
+  font-size: 38px;
+  line-height: 1.4;
+  margin-bottom: 18px;
+}
+@media (max-width: 1024px) {
+  h3 {
+    font-size: 22px;
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+}
+@media (max-width: 768px) {
+  h3 {
+    font-size: 28px;
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+}
+
+h4 {
+  font-size: 36px;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+@media (max-width: 1024px) {
+  h4 {
+    font-size: 28px;
+    line-height: 1.6;
+    margin-bottom: 14px;
+  }
+}
+@media (max-width: 768px) {
+  h4 {
+    font-size: 20px;
+    line-height: 1.7;
+    margin-bottom: 10px;
+  }
+}
+
+h5 {
+  font-size: 30px;
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+@media (max-width: 1024px) {
+  h5 {
+    font-size: 24px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+  }
+}
+@media (max-width: 768px) {
+  h5 {
+    font-size: 18px;
+    line-height: 1.8;
+    margin-bottom: 8px;
+  }
+}
+
+h6 {
+  font-size: 24px;
+  line-height: 1.7;
+  margin-bottom: 12px;
+}
+@media (max-width: 1024px) {
+  h6 {
+    font-size: 20px;
+    line-height: 1.8;
+    margin-bottom: 10px;
+  }
+}
+@media (max-width: 768px) {
+  h6 {
+    font-size: 16px;
+    line-height: 1.9;
+    margin-bottom: 6px;
+  }
+}
+
+p,
+li,
+span,
+a {
+  font-size: 24px;
+  line-height: 1.6;
+}
+@media (max-width: 1024px) {
+  p,
+  li,
+  span,
+  a {
+    font-size: 20px;
+    line-height: 1.7;
+  }
+}
+@media (max-width: 768px) {
+  p,
+  li,
+  span,
+  a {
+    font-size: 18px;
+    line-height: 1.8;
+  }
+}
+
+.language-php span,
+.language-html span,
+.language-js span {
+  font-size: initial;
+  line-height: initial;
+}
+/*!****************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js!./node_modules/highlight.js/styles/github-dark.css ***!
+  \****************************************************************************************************/
 pre code.hljs {
   display: block;
   overflow-x: auto;

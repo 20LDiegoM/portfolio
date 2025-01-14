@@ -4,7 +4,7 @@ const TerserPlugin = require("terser-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = {
-    mode: "production",
+    mode: "development",
     entry: {
         custom: "./src/js/main.js",
         vendor: "./src/js/vendor.js",
@@ -72,5 +72,10 @@ module.exports = {
         devMiddleware: {
             writeToDisk: true,
         },
+    },
+    performance: {
+        hints: false,
+        //maxAssetSize: 5000000,
+        //maxEntrypointSize: 8000000,
     },
 };

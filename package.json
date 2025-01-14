@@ -9,15 +9,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/20LDiegoM/resume.git"
+    "url": "git+https://github.com/20LDiegoM/portfolio.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/20LDiegoM/resume/issues"
+    "url": "https://github.com/20LDiegoM/portfolio/issues"
   },
-  "homepage": "https://github.com/20LDiegoM/resume#readme",
+  "homepage": "https://github.com/20LDiegoM/portfolio#readme",
   "devDependencies": {
     "babel-loader": "^9.2.1",
     "copy-webpack-plugin": "^12.0.2",

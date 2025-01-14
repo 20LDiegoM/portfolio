@@ -20,6 +20,13 @@ svg {
     p {
         color: vars.$white-bg;
     }
+
+    svg {
+        background-color: transparent;
+        width: 40px;
+        height: auto;
+        cursor: pointer;
+    }
 }
 
 .my-work {
@@ -29,7 +36,7 @@ svg {
     padding-top: vars.$curve-height;
 
     a {
-        color: vars.$white-bg;
+        color: #333;
     }
     .card {
         border-radius: 5%;
