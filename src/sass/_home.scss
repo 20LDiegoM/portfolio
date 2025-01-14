@@ -4,7 +4,7 @@
 svg {
     margin-top: -1px;
     margin-bottom: -1px;
-    background-color: #f5f5f5;
+    //background-color: #f5f5f5;
 }
 
 .main-banner {
@@ -126,10 +126,20 @@ svg {
 .main-footer {
     height: 100px;
     background-color: vars.$main-color;
-
-    .copy {
+    .text-center {
         text-align: center;
+    }
+    .copy {
         font-size: 15px;
         color: vars.$white-bg;
+    }
+    a {
+        text-decoration: none;
+    }
+
+    svg {
+        width: 30px;
+        height: auto;
+        background-color: transparent;
     }
 }
