@@ -1,0 +1,759 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Legal Site</title>
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="stylesheet" href="/dist/vendor.bundle.css" />
+        <link rel="stylesheet" href="/dist/custom.bundle.css" />
+    </head>
+    <body>
+        <section class="main-banner">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 col-lg-6">
+                        <h1 data-aos="fade-up" class="main-banner-title">Legal Site.</h1>
+                        <p data-aos="fade-up" class="main-banner-description">Developed and maintained a responsive website showcase legal services and information.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+            <path fill="#0F1C2E" fill-opacity="1" d="M0,128L288,192L576,224L864,160L1152,160L1440,128L1440,0L1152,0L864,0L576,0L288,0L0,0Z"></path>
+        </svg>
+
+        <section class="description-project">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <h2 data-aos="fade-up">Custom Plugin</h2>
+                        <p data-aos="fade-up">This is a plugin based on the client's requirements.</p>
+
+                        <p data-aos="fade-up">The following code snippet is an implementation of a cronjob management system and custom configurations for a WordPress plugin. This code includes key functionalities such as:</p>
+                        <ul data-aos="fade-up">
+                            <li>Registering custom routes in the WordPress REST API.</li>
+                            <li>Setting up and managing scheduled tasks (cronjobs) to automate specific processes, such as publishing or unpublishing content.</li>
+                            <li>Managing permissions to ensure that only users with specific roles can perform certain actions.</li>
+                            <li>Interacting with WordPress options and custom fields to store and retrieve dynamic settings.</li>
+                        </ul>
+
+                        <p data-aos="fade-up">The full source code of the plugin's main class is provided below, including comments to help understand each functionality.</p>
+
+                        <pre data-aos="fade-up">
+                            <code class="language-php">
+                                namespace xxUnpu;
+                                
+                                use WP_REST_Request;
+                                use WP_REST_Response;
+                                
+                                class Main
+                                {
+                                    /**
+                                     * Constructor to initialize actions and filters.
+                                     */
+                                    public function __construct()
+                                    {
+                                        add_action('admin_menu', [$this, 'add_admin_menu']);
+                                        add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_scripts']);
+                                        add_action('rest_api_init', [$this, 'register_api_routes']);
+                                    }
+                                
+                                    /**
+                                     * Adds the main admin menu and submenus for the plugin.
+                                     */
+                                    public function add_admin_menu()
+                                    {
+                                        $unpu_page = add_menu_page(
+                                            'Unpublish Manager',
+                                            'Unpublish Manager',
+                                            'manage_options',
+                                            xx_UNPU_ADMIN_PAGE,
+                                            [$this, 'render_people_table']
+                                        );
+                                
+                                        add_submenu_page(
+                                            xx_UNPU_ADMIN_PAGE,
+                                            'Unpublish Media Posts',
+                                            'Unpublish Media Posts',
+                                            'manage_options',
+                                            'xx-unpu-media',
+                                            [$this, 'render_media_table']
+                                        );
+                                    }
+                                
+                                    /**
+                                     * Renders the media table template.
+                                     */
+                                    public function render_media_table()
+                                    {
+                                        include xx_UNPU_ROOT . '/templates/media-table.php';
+                                    }
+                                
+                                    /**
+                                     * Enqueues admin styles and scripts for the plugin.
+                                     */
+                                    public function enqueue_admin_scripts()
+                                    {
+                                        wp_enqueue_style(
+                                            'xx-unpu',
+                                            xx_UNPU_PLUGIN_URI . 'assets/style.css',
+                                            null,
+                                            filemtime(plugin_dir_path(__DIR__) . 'assets/style.css'),
+                                            false
+                                        );
+                                
+                                        wp_enqueue_script(
+                                            'xx-unpu',
+                                            xx_UNPU_PLUGIN_URI . 'assets/script.js',
+                                            [],
+                                            filemtime(plugin_dir_path(__DIR__) . 'assets/script.js')
+                                        );
+                                    }
+                                
+                                    /**
+                                     * Handles the REST API endpoint for updating the media cronjob settings.
+                                     *
+                                     * @param WP_REST_Request $request The REST API request object.
+                                     * @return WP_REST_Response The response object containing the status message.
+                                     */
+                                    public function media_auto_update_cronjob_rest(WP_REST_Request $request)
+                                    {
+                                        $payload = $request->get_params();
+                                        $cron_type = isset($payload['cron-type']) ? $payload['cron-type'] : null;
+                                
+                                        if (!$cron_type || !in_array($cron_type, ['five-years', 'two-years'])) {
+                                            return new WP_REST_Response([
+                                                'message' => 'Invalid or missing cron-type parameter.'
+                                            ], 400);
+                                        }
+                                
+                                        // Configuration for cron jobs
+                                        $cron_jobs = [
+                                            'five-years' => [
+                                                'enable_option' => 'unpublish_media_auto_status',
+                                                'date_option' => 'unpublish_media_auto_date',
+                                                'event_name' => 'update_auto_media_posts_event',
+                                                'schedule' => 'yearly',
+                                                'log_prefix' => 'five_years'
+                                            ],
+                                            'two-years' => [
+                                                'enable_option' => 'unpublish_media_auto_status_two',
+                                                'date_option' => 'unpublish_media_auto_date_two',
+                                                'event_name' => 'update_auto_media_posts_event_two',
+                                                'schedule' => 'daily',
+                                                'log_prefix' => 'two_years'
+                                            ]
+                                        ];
+                                
+                                        $settings = $cron_jobs[$cron_type];
+                                        $enableCronjob = isset($payload["cronjob-checkbox"]) ? '1' : '0';
+                                        $selected_date = isset($payload["cronjob-date"]) ? sanitize_text_field($payload["cronjob-date"]) : date('Y-m-d');
+                                
+                                        update_option($settings['date_option'], $selected_date);
+                                        update_option($settings['enable_option'], $enableCronjob);
+                                
+                                        $background_process_five_years = new \MediaBackgroundProcess('media_auto_update_five_years');
+                                        $background_process_two_years = new \MediaBackgroundProcess('media_auto_update_two_years');
+                                
+                                        if ($enableCronjob === '1') {
+                                            $timestamp = strtotime($selected_date . ' 00:00:00');
+                                
+                                            if (!wp_next_scheduled($settings['event_name'])) {
+                                                wp_schedule_event($timestamp, $settings['schedule'], $settings['event_name']);
+                                                $next_run_date = wp_next_scheduled($settings['event_name']);
+                                                update_option("next_run_{$settings['event_name']}", date('Y-m-d H:i:s', $next_run_date));
+                                                error_log("Cronjob scheduled for {$settings['schedule']} execution.");
+                                            }
+                                        } else {
+                                            $timestamp = wp_next_scheduled($settings['event_name']);
+                                            if ($timestamp) {
+                                                wp_unschedule_event($timestamp, $settings['event_name']);
+                                                delete_option("next_run_{$settings['event_name']}");
+                                                error_log("Cronjob unscheduled.");
+                                
+                                                if ($cron_type == 'five-years') {
+                                                    $background_process_five_years->delete_all();
+                                                } else {
+                                                    $background_process_two_years->delete_all();
+                                                }
+                                            }
+                                        }
+                                
+                                        return new WP_REST_Response([
+                                            'message' => "Cronjob for {$cron_type} updated."
+                                        ], 200);
+                                    }
+                                
+                                    /**
+                                     * Retrieves the status of the 5-year cronjob.
+                                     *
+                                     * @param WP_REST_Request $request The REST API request object.
+                                     * @return WP_REST_Response The response object with cronjob status information.
+                                     */
+                                    public function get_cronjob_status_five_years(WP_REST_Request $request)
+                                    {
+                                        $last_run_date_five = get_option('last_run_update_auto_media_posts_event', 'Never');
+                                        $cronjob_status_five = get_option('unpublish_media_auto_status');
+                                        $logs_five = get_option('cronjob_log_five_years', 'No logs yet.');
+                                
+                                        return new WP_REST_Response([
+                                            'last_run' => $last_run_date_five,
+                                            'status' => $cronjob_status_five ? 'Enabled' : 'Disabled',
+                                            'logs' => $logs_five,
+                                        ], 200);
+                                    }
+                                
+                                    /**
+                                     * Retrieves the status of the 2-year cronjob.
+                                     *
+                                     * @param WP_REST_Request $request The REST API request object.
+                                     * @return WP_REST_Response The response object with cronjob status information.
+                                     */
+                                    public function get_cronjob_status_two_years(WP_REST_Request $request)
+                                    {
+                                        $last_run_date_two = get_option('last_run_update_auto_media_posts_event_two', 'Never');
+                                        $cronjob_status_two = get_option('unpublish_media_auto_status_two');
+                                        $logs_two = get_option('cronjob_log_two_years', 'No logs yet.');
+                                
+                                        return new WP_REST_Response([
+                                            'last_run' => $last_run_date_two,
+                                            'status' => $cronjob_status_two ? 'Enabled' : 'Disabled',
+                                            'logs' => $logs_two,
+                                        ], 200);
+                                    }
+                                
+                                    /**
+                                     * Clears the cronjob logs for the specified type.
+                                     *
+                                     * @param WP_REST_Request $request The REST API request object.
+                                     * @return WP_REST_Response The response indicating if the log was cleared successfully.
+                                     */
+                                    public function clear_cronjob_log(WP_REST_Request $request)
+                                    {
+                                        $type = $request->get_param('type');
+                                        error_log(print_r("clear cron: " . $type, true));
+                                
+                                        if ($type === 'five-years') {
+                                            update_option('cronjob_log_five_years', 'No logs yet.');
+                                            wp_cache_delete('cronjob_log_five_years', 'options');
+                                            error_log('deleted five');
+                                        } elseif ($type === 'two-years') {
+                                            update_option('cronjob_log_two_years', 'No logs yet.');
+                                            wp_cache_delete('cronjob_log_two_years', 'options');
+                                        }
+                                
+                                        return new WP_REST_Response(['message' => 'Log cleared successfully'], 200);
+                                    }
+                                
+                                    /**
+                                     * Excludes media from automatic processes via REST API.
+                                     *
+                                     * @param WP_REST_Request $request The REST API request object.
+                                     * @return WP_REST_Response The response indicating if the field was updated successfully.
+                                     */
+                                    public function exclude_media_auto_exclude(WP_REST_Request $request)
+                                    {
+                                        $payload = $request->get_params();
+                                        $exclude_media_ids = $payload;
+                                
+                                        $updated = update_field('related_media_posts', $exclude_media_ids, 'options');
+                                
+                                        if (is_wp_error($updated)) {
+                                            return new WP_REST_Response([
+                                                'error' => 'There was an error updating the field.',
+                                            ], 500);
+                                        }
+                                
+                                        return new WP_REST_Response([
+                                            'field-updated' => 'Field successfully updated',
+                                        ], 200);
+                                    }
+                                
+                                    /**
+                                     * Checks if the current user has the required permissions for REST API requests.
+                                     *
+                                     * @return bool True if the user has the required role, false otherwise.
+                                     */
+                                    public function api_permissions()
+                                    {
+                                        $auth_cookie = wp_parse_auth_cookie('', 'logged_in');
+                                        $user = get_user_by('login', $auth_cookie['username']);
+                                
+                                        if ($user !== false && $user->exists()) {
+                                            return in_array('xx_user', (array) $user->roles) ||
+                                                   in_array('xx_admin_user', (array) $user->roles) ||
+                                                   in_array('administrator', (array) $user->roles);
+                                        }
+                                
+                                        return false;
+                                    }
+                                
+                                    /**
+                                     * Registers custom REST API routes for the plugin.
+                                     */
+                                    public function register_api_routes()
+                                    {
+                                        register_rest_route('unpu', '/exclude-media-auto-exclude', array(
+                                            'methods' => array('GET', 'POST'),
+                                            'callback' => [$this, 'exclude_media_auto_exclude'],
+                                            'permission_callback' => [$this, 'api_permissions'],
+                                        ));
+                                
+                                        register_rest_route('unpu', '/media-auto-update-cronjob-rest', array(
+                                            'methods' => 'POST',
+                                            'callback' => [$this, 'media_auto_update_cronjob_rest'],
+                                            'permission_callback' => [$this, 'api_permissions'],
+                                        ));
+                                
+                                        register_rest_route('unpu', '/get-cronjob-status-five-years', array(
+                                            'methods' => 'GET',
+                                            'callback' => [$this, 'get_cronjob_status_five_years'],
+                                            'permission_callback' => [$this, 'api_permissions'],
+                                        ));
+                                
+                                        register_rest_route('unpu', '/get-cronjob-status-two-years', array(
+                                            'methods' => 'GET',
+                                            'callback' => [$this, 'get_cronjob_status_two_years'],
+                                            'permission_callback' => [$this, 'api_permissions'],
+                                        ));
+                                
+                                        register_rest_route('unpu', '/clear-cronjob-log', array(
+                                            'methods' => 'POST',
+                                            'callback' => [$this, 'clear_cronjob_log'],
+                                            'permission_callback' => [$this, 'api_permissions'],
+                                        ));
+                                    }
+                                }
+                            </code>
+                        </pre>
+
+                        <p data-aos="fade-up">This code manages scheduled tasks (cronjobs) in WordPress to update "media" post types. It includes:</p>
+                        <ul data-aos="fade-up">
+                            <li>Registering cron events for two periods: "annual" and "daily".</li>
+                            <li>Bulk updating posts by changing their status to "draft" based on criteria such as dates and exclusions.</li>
+                            <li>Logging detailed records to monitor execution.</li>
+                            <li>Custom queries to handle dynamic content efficiently.</li>
+                        </ul>
+                        <p data-aos="fade-up">It provides an efficient solution to automate maintenance processes and control content in WordPress.</p>
+
+                        <pre data-aos="fade-up">
+                            <code class="language-php">
+   
+                                /**
+                                * Registers a WordPress action for the "five_years" cron event.
+                                */
+                                add_action('update_auto_media_posts_event', function () {
+                                    media_auto_update_cronjob('five_years');
+                                });
+
+                                /**
+                                * Registers a WordPress action for the "two_years" cron event.
+                                */
+                                add_action('update_auto_media_posts_event_two', function () {
+                                    media_auto_update_cronjob('two_years');
+                                });
+
+                                /**
+                                * Logs messages for cronjob activities.
+                                *
+                                * @param string $message The message to log.
+                                * @param string $type The type of log, either 'five_years' or 'two_years'.
+                                */
+                                function add_to_cron_log($message, $type = 'five_years') {
+                                    $log_option = $type === 'five_years' ? 'cronjob_log_five_years' : 'cronjob_log_two_years';
+                                    $existing_logs = get_option($log_option, '');
+                                    $timestamp = current_time('timestamp');
+                                    $formatted_date = gmdate('Y-m-d H:i:s T O', $timestamp);
+                                    $new_log_entry = "[$formatted_date] $message\n";
+
+                                    // Remove default message if present
+                                    if (trim($existing_logs) === 'No logs yet.') {
+                                        $existing_logs = '';
+                                    }
+
+                                    // Append the new log entry and update the option.
+                                    update_option($log_option, $existing_logs . $new_log_entry);
+                                }
+
+                                /**
+                                * Updates the status of multiple posts to 'draft' in bulk.
+                                *
+                                * @param array $post_ids The array of post IDs to update.
+                                * @param string $log_type The type of log, either 'five_years' or 'two_years'.
+                                * @return int|false The number of rows affected, or false on error.
+                                */
+                                function bulk_update_posts_to_draft($post_ids, $log_type) {
+                                    global $wpdb;
+
+                                    // Ensure all post IDs are integers.
+                                    $post_ids = array_map('absint', $post_ids);
+                                    $ids_placeholder = implode(',', array_fill(0, count($post_ids), '%d'));
+
+                                    // Prepare and execute the SQL update query.
+                                    $query = "UPDATE {$wpdb->posts} 
+                                            SET post_status = 'draft' 
+                                            WHERE ID IN ($ids_placeholder)";
+                                    $result = $wpdb->query($wpdb->prepare($query, $post_ids));
+
+                                    if ($result === false) {
+                                        error_log('Error updating posts: ' . $wpdb->last_error);
+                                        add_to_cron_log('Error updating posts: ' . $wpdb->last_error, $log_type);
+                                        return false;
+                                    }
+
+                                    // Clear the cache and log the updates.
+                                    wp_cache_flush();
+                                    $total_posts = count($post_ids);
+                                    $detailed_count = 100;
+
+                                    foreach (array_slice($post_ids, 0, $detailed_count) as $post_id) {
+                                        add_to_cron_log("Post ID {$post_id} changed to draft successfully.", $log_type);
+                                    }
+
+                                    if ($total_posts > $detailed_count) {
+                                        $remaining_posts = $total_posts - $detailed_count;
+                                        add_to_cron_log("And {$remaining_posts} more posts changed to draft successfully.", $log_type);
+                                    }
+                                    
+                                    return $result;
+                                }
+
+                                /**
+                                * Handles the automatic update of media posts for a specified cron type.
+                                *
+                                * @param string $type The type of cron job ('five_years' or 'two_years').
+                                */
+                                function media_auto_update_cronjob($type) {
+                                    $log_type = $type === 'two_years' ? 'two_years' : 'five_years';
+
+                                    // Log the start of the cron job.
+                                    add_to_cron_log('Running...', $log_type);
+                                    error_log("Cronjob running for {$log_type}...");
+
+                                    // Determine the cutoff date for the query.
+                                    $since_option = $type === 'two_years' ? 'unpublish_media_auto_date_two' : 'unpublish_media_auto_date';
+                                    $since = get_option($since_option, '2026-01-01');
+                                    $since_timestamp = strtotime($since);
+                                    $time_period = $type === 'two_years' ? '-2 years' : '-4 years';
+                                    $cutoff_date = strtotime($time_period, $since_timestamp);
+                                    $exclude_media_ids = get_field('related_media_posts', 'options') ?: [];
+                                    $formatted_date = date('Y-m-d', $cutoff_date);
+                                    $local_time = current_time('timestamp');
+                                    $formatted_last_date = gmdate('Y-m-d H:i:s T O', $local_time);
+
+                                    // Log relevant information.
+                                    add_to_cron_log("Since: {$formatted_date}", $log_type);
+                                    add_to_cron_log('Exclude IDs: ' . (is_array($exclude_media_ids) ? implode(', ', $exclude_media_ids) : $exclude_media_ids), $log_type);
+
+                                    // Build the query arguments to fetch the posts.
+                                    $args = array(
+                                        'post_type'      => 'media',
+                                        'post_status'    => 'publish',
+                                        'posts_per_page' => -1,
+                                        'post__not_in'   => $exclude_media_ids,
+                                        'date_query'     => array(
+                                            array(
+                                                'before'    => date('Y-m-d', $cutoff_date),
+                                                'inclusive' => true,
+                                            )
+                                        ),
+                                        'fields'         => 'ids',
+                                    );
+
+                                    // Add a meta query for 'two_years'.
+                                    if ($type === 'two_years') {
+                                        $args['meta_query'] = array(
+                                            array(
+                                                'key'     => 'gated_content_disclaimer',
+                                                'value'   => '1',
+                                                'compare' => '='
+                                            )
+                                        );
+                                    }
+
+                                    $posts_to_process = get_posts($args);
+
+                                    // Exit if no posts are found.
+                                    if (empty($posts_to_process)) {
+                                        $last_run_option = $type === 'two_years' ? 'last_run_update_auto_media_posts_event_two' : 'last_run_update_auto_media_posts_event';
+                                        update_option($last_run_option, $formatted_last_date);
+                                        add_to_cron_log('No posts found to process.', $log_type);
+                                        error_log('No posts, stopping process.');
+                                        return;
+                                    }
+
+                                    // Log the total number of posts found and process them in bulk.
+                                    add_to_cron_log('Total Posts Found: ' . count($posts_to_process), $log_type);
+                                    bulk_update_posts_to_draft($posts_to_process, $log_type);
+
+                                    // Finalize the cron job.
+                                    add_to_cron_log('All posts processed.', $log_type);
+                                    $last_run_option = $type === 'two_years' ? 'last_run_update_auto_media_posts_event_two' : 'last_run_update_auto_media_posts_event';
+                                    update_option($last_run_option, $formatted_last_date);
+                                    error_log('Cronjob completed successfully.');
+                                }
+
+                            </code>
+                        </pre>
+
+                        <p data-aos="fade-up">This code defines a <code>MediaTable</code> class based on <code>WP_List_Table</code> to create a custom table in the WordPress admin area.</p>
+
+                        <pre data-aos="fade-up">
+                            <code class="language-php">
+                                namespace xxUnpu\Table;
+
+                                use WP_Query;
+                                use WP_List_Table;
+                                use WP_Post;
+
+                                class MediaTable extends WP_List_Table
+                                {
+                                    /**
+                                    * Constructor for the MediaTable class.
+                                    */
+                                    public function __construct()
+                                    {
+                                        // Set up the list table with singular and plural labels
+                                        parent::__construct([
+                                            'singular' => 'media',
+                                            'plural' => 'media'
+                                        ]);
+                                    }
+
+                                    /**
+                                    * Check if the current user has permission to make AJAX requests.
+                                    *
+                                    * @return bool True if the user can edit posts, false otherwise.
+                                    */
+                                    public function ajax_user_can()
+                                    {
+                                        return current_user_can('editor');
+                                    }
+
+                                    /**
+                                    * Display a message when there are no items found.
+                                    */
+                                    public function no_items()
+                                    {
+                                        echo 'No people found';
+                                    }
+
+                                    /**
+                                    * Get a list of columns for the list table.
+                                    *
+                                    * @return array Array of column names.
+                                    */
+                                    function get_columns()
+                                    {
+                                        return array(
+                                            'post_title' => 'Title',
+                                            'post_id' => 'ID',
+                                            'status_post' => 'Status Post',
+                                            'status_acf' => 'Gated Content Status',
+                                            'date' => 'Date',
+                                            'lang' => 'Language'
+                                        );
+                                    }
+
+                                    /**
+                                    * Get a list of hidden columns for the list table.
+                                    *
+                                    * @return array Array of column names that are hidden.
+                                    */
+                                    public function get_hidden_columns()
+                                    {
+                                        return [];
+                                    }
+
+                                    /**
+                                    * Get a list of sortable columns for the list table.
+                                    *
+                                    * @return array Array of sortable columns.
+                                    */
+                                    protected function get_sortable_columns()
+                                    {
+                                        return [];
+                                    }
+
+                                    /**
+                                    * Prepare the list table items.
+                                    */
+                                    public function prepare_items()
+                                    {
+                                        // Set up column headers
+                                        $this->_column_headers = array(
+                                            $this->get_columns(),
+                                            $this->get_hidden_columns(),
+                                            $this->get_sortable_columns(),
+                                        );
+
+                                        // Handle search input
+                                        $search = isset($_REQUEST['s']) ? wp_unslash(trim($_REQUEST['s'])) : '';
+
+                                        $unpu_per_page = 20;
+                                        $paged = $this->get_pagenum();
+
+                                        // Query arguments to fetch media posts
+                                        $args = [
+                                            'post_type' => 'media',
+                                            'posts_per_page' => $unpu_per_page,
+                                            'offset' => ($paged - 1) * $unpu_per_page,
+                                        ];
+
+                                        // Add search term if present
+                                        if (!empty($search)) {
+                                            $args['s'] = $search;
+                                        }
+
+                                        // Add orderby and order parameters if set
+                                        if (isset($_REQUEST['orderby'])) {
+                                            $args['orderby'] = $_REQUEST['orderby'];
+                                        }
+
+                                        if (isset($_REQUEST['order'])) {
+                                            $args['order'] = $_REQUEST['order'];
+                                        }
+
+                                        // Execute the query
+                                        $query = new WP_Query($args);
+                                        $this->items = $query->posts;
+
+                                        // Set up pagination arguments
+                                        $this->set_pagination_args(
+                                            array(
+                                                'total_items' => $query->found_posts,
+                                                'per_page'    => $unpu_per_page,
+                                            )
+                                        );
+                                    }
+
+                                    /**
+                                    * Generate the list table rows.
+                                    */
+                                    public function display_rows()
+                                    {
+                                        foreach ($this->items as $media) {
+                                            echo "\n\t" . $this->single_row($media);
+                                        }
+                                    }
+
+                                    /**
+                                    * Generate HTML for a single row.
+                                    *
+                                    * @param WP_Post $media The current media item.
+                                    * @return string HTML output for a single row.
+                                    */
+                                    public function single_row($media)
+                                    {
+                                        $r = "<tr id='media-$media->ID'>";
+
+                                        // Set up actions for the 'edit' and 'view' links
+                                        $actions = [];
+                                        $edit_page = 'post.php?' . http_build_query([
+                                            'post' => $media->ID,
+                                            'action' => 'edit'
+                                        ]);
+                                        $view_link = get_permalink($media->ID);
+                                        $actions['edit'] = "Edit";
+                                        $actions['view'] = "View";
+
+                                        // Get column information
+                                        list($columns, $hidden, $sortable, $primary) = $this->get_column_info();
+
+                                        // Loop through each column and generate cell content
+                                        foreach ($columns as $column_name => $column_display_name) {
+                                            $css_classes = "$column_name column-$column_name";
+                                            if ($primary === $column_name) {
+                                                $css_classes .= ' has-row-actions column-primary';
+                                            }
+
+                                            if (in_array($column_name, $hidden, true)) {
+                                                $css_classes .= ' hidden';
+                                            }
+
+                                            $data = 'data-colname="' . wp_strip_all_tags($column_display_name) . '"';
+                                            $attributes = "class='$css_classes' $data";
+                                            $r .= "<td $attributes>";
+
+                                            // Render cell content based on the column name
+                                            switch ($column_name) {
+                                                case 'post_id':
+                                                    $post_id = $media->ID;
+                                                    $r .= ucfirst($post_id);
+                                                    break;
+                                                case 'post_title':
+                                                    $name = $media->post_title ?: '(no name)';
+                                                    $r .= $name;
+                                                    break;
+                                                case 'status_post':
+                                                    $post_status = get_post_status($media->ID);
+                                                    $r .= ucfirst($post_status);
+                                                    break;
+                                                case 'status_acf':
+                                                    $status_acf = get_post_meta($media->ID, 'gated_content_disclaimer', true);
+                                                    $r .= !empty($status_acf) ? 'Active' : 'Inactive';
+                                                    break;
+                                                case 'date':
+                                                    $status = get_the_date('d M Y', $media->ID);
+                                                    $r .= ucfirst($status);
+                                                    break;
+                                                case 'lang':
+                                                    $translations = pll_the_languages(array('raw' => 1));
+                                                    $lang = pll_get_post_language($media->ID);
+                                                    $r .= $translations[$lang]['flag'];
+                                                    break;
+                                            }
+
+                                            // Add row actions if this is the primary column
+                                            if ($primary === $column_name) {
+                                                $r .= $this->row_actions($actions);
+                                            }
+
+                                            $r .= '</td>';
+                                        }
+
+                                        $r .= '</tr>';
+
+                                        return $r;
+                                    }
+                                }
+                            </code>
+                        </pre>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        <h3 data-aos="fade-up">Preview</h3>
+                    </div>
+                    <div class="col-12" data-aos="fade-up">
+                        <img class="project-img" src="/dist/images/custom_plugin.webp" alt="Custom Plugin preview" />
+                    </div>
+                    <div class="col-12" data-aos="fade-up">
+                        <img class="project-img" src="/dist/images/custom_plugin2.webp" alt="Custom Plugin preview" />
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+            <path fill="#0F1C2E" fill-opacity="1" d="M0,128L288,192L576,224L864,160L1152,160L1440,128L1440,320L1152,320L864,320L576,320L288,320L0,320Z"></path>
+        </svg>
+
+        <section class="main-footer">
+            <footer>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12">
+                            <p class="copy">© 2025 Luis Diego</p>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </section>
+
+        <script src="/dist/vendor.bundle.js"></script>
+        <script src="/dist/custom.bundle.js"></script>
+    </body>
+</html>

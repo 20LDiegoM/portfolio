@@ -1,0 +1,128 @@
+@use "variables" as vars;
+@use "mixins" as mx;
+
+svg {
+    margin-top: -1px;
+    margin-bottom: -1px;
+    background-color: #f5f5f5;
+}
+
+.main-banner {
+    background-color: vars.$main-color;
+    position: relative;
+    height: 60vh;
+
+    .container {
+        @include mx.flex-center;
+    }
+
+    h1,
+    p {
+        color: vars.$white-bg;
+    }
+}
+
+.my-work {
+    background-color: vars.$gray-bg;
+    position: relative;
+    margin-top: -#{vars.$curve-height};
+    padding-top: vars.$curve-height;
+
+    a {
+        color: vars.$white-bg;
+    }
+    .card {
+        border-radius: 5%;
+        padding: 15px;
+        margin-bottom: 60px;
+        box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
+        overflow: hidden;
+        position: relative;
+
+        .overlay-div {
+            p {
+                display: none;
+                color: vars.$white-bg;
+                padding: 0 20px;
+
+                font-size: 18px;
+                line-height: 1.8;
+            }
+        }
+
+        &:hover {
+            .overlay-div {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                background-color: vars.$main-color;
+                left: 0;
+                z-index: 2;
+                top: 0;
+                opacity: 0.9;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                &.more {
+                    cursor: pointer;
+                }
+                p {
+                    display: block;
+                }
+            }
+        }
+        &-img {
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            width: 100%;
+            min-height: 180px;
+            transition: transform 0.5s ease;
+
+            @media (max-width: 768px) {
+                min-height: 230px;
+            }
+
+            &.legal {
+                background-image: url(/dist/images/legal.webp);
+            }
+
+            &.hotel {
+                background-image: url(/dist/images/hotel.webp);
+            }
+
+            &.ac {
+                background-image: url(/dist/images/ac.webp);
+            }
+
+            &.rent-a-car {
+                background-image: url(/dist/images/rent-a-car.webp);
+            }
+            &.tourism {
+                background-image: url(/dist/images/tourism.webp);
+            }
+
+            &.placeholder {
+                background-image: url(/dist/images/placeholder.webp);
+            }
+        }
+
+        &-content {
+            margin-top: 30px;
+            h3 {
+                font-size: 18px;
+            }
+        }
+    }
+}
+
+.main-footer {
+    height: 100px;
+    background-color: vars.$main-color;
+
+    .copy {
+        text-align: center;
+        font-size: 15px;
+        color: vars.$white-bg;
+    }
+}

@@ -1,0 +1,450 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Rent A Car Site</title>
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="stylesheet" href="/dist/vendor.bundle.css" />
+        <link rel="stylesheet" href="/dist/custom.bundle.css" />
+    </head>
+    <body>
+        <section class="main-banner">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 col-lg-6">
+                        <h1 data-aos="fade-up" class="main-banner-title">Search with AJAX & Autocomplete</h1>
+                        <p data-aos="fade-up" class="main-banner-description">This code implements an advanced search system for a website using jQuery and AJAX. It is designed to handle dynamic searches with custom filters, autocomplete, and real-time user interface updates.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+            <path fill="#0F1C2E" fill-opacity="1" d="M0,128L288,192L576,224L864,160L1152,160L1440,128L1440,0L1152,0L864,0L576,0L288,0L0,0Z"></path>
+        </svg>
+
+        <section class="description-project">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <h3 data-aos="fade-up">Key Features</h3>
+                        <ul data-aos="fade-up">
+                            <li><strong>Dynamic Search:</strong> AJAX requests are sent to the server to retrieve results based on selected filters, search terms, language, and sorting options.</li>
+                            <li><strong>Autocomplete:</strong> Includes an autocomplete feature that suggests results as the user types, with a debounce system to optimize requests.</li>
+                            <li><strong>URL Update:</strong> Uses the browser history to update the address bar with the current search parameters, making results easy to share or access upon page reload.</li>
+                            <li><strong>Filters and Subfilters:</strong> Dynamic filters allow users to narrow results to specific categories like "media," "insights," or "events." Subfilters are automatically enabled or disabled based on the main filter selection.</li>
+                            <li><strong>Language Switch:</strong> Integrates with the Polylang plugin to update results and the URL based on the selected language, ensuring a localized search experience.</li>
+                            <li><strong>Support for Multiple Pages:</strong> The search functionality is integrated into both the homepage and the results page, providing a consistent experience for users.</li>
+                        </ul>
+
+                        <pre data-aos="fade-up">
+                            <code class="language-js">
+                                /**
+                                * This JavaScript code implements a comprehensive search and filtering functionality for a webpage.
+                                * Key Features:
+                                * - `swiftypeSearch()`: Sends an AJAX GET request to fetch filtered search results and updates the URL dynamically without refreshing the page.
+                                * - `searchGetParametes()`: Extracts search parameters from the current URL.
+                                * - `changeURLWorldwide()`: Adjusts the `href` attributes of language switcher links to maintain search terms when switching languages.
+                                * - Event listeners handle:
+                                *    - Form submissions for search queries.
+                                *    - Category, year, language, and date-based filtering.
+                                *    - Autocomplete functionality with a debounce function to optimize performance.
+                                * - Includes user interface adjustments such as showing/hiding sub-filters and updating text elements.
+                                * 
+                                * Dependencies:
+                                * - jQuery library for event handling and AJAX calls.
+                                * 
+                                */
+
+                                 function swiftypeSearch(filterString, postFilter, subPostFilter, sortParam, langString) {
+                                    setSpinnerLoad();
+                                  
+                                    $.ajax({
+                                      type: 'GET',
+                                      url: WpUtils.ajaxurl,
+                                      data: {
+                                        action: 'SearchGeneralWithFiltersAjax',
+                                        filter: filterString,
+                                        post_filter: postFilter,
+                                        sub_post_filter: subPostFilter,
+                                        sort_lang: langString,
+                                        sort: sortParam
+                                      },
+                                      success: function(result) {
+                                        var url = new URLSearchParams(window.location.search);
+                                        var newPath = '';
+                                  
+                                        url.set("s", filterString);
+                                        url.set("filter", postFilter);
+                                        url.set("lang", langString);
+                                        url.delete("page");
+                                  
+                                        if (subPostFilter) {
+                                          url.set("subFilter", subPostFilter);
+                                        } else {
+                                          url.delete("subFilter"); 
+                                        }
+                                        
+                                        if (sortParam  && sortParam != 'relevant') {
+                                          url.set("sort", sortParam);
+                                        } else {
+                                          url.delete("sort")
+                                        }
+                                              
+                                  
+                                        if (langString === "it" || langString === "fr" || langString === "de") {
+                                          newPath = "/" + langString + "/?" + url.toString();
+                                        } else {
+                                          newPath = "/?" +url.toString();
+                                        }
+                                  
+                                  
+                                        window.history.pushState(null, null, newPath);
+                                  
+                                        $('.section-general-search-results').html(result);
+                                  
+                                        removeSpinnerLoad();
+                                      },
+                                      error: function(error) {
+                                        console.log("Please try again: "+ error)
+                                      }
+                                    });
+                                  };
+                                  
+                                  function searchGetParametes() {
+                                    var url = new URLSearchParams(window.location.search);
+                                  
+                                    return {
+                                      search: $('.header-general-search').val(),
+                                      filter: url.get('filter'),
+                                      subFilter: url.get('subFilter'),
+                                      sort: url.get('sort'),
+                                      langString: url.get('lang'),
+                                      page: url.get('page'),
+                                  
+                                    }
+                                  };
+                                  
+                                  
+                                  function changeURLWorldwide() {
+                                    var urlQuery = new URLSearchParams(window.location.search);
+                                  
+                                    if (urlQuery && urlQuery.has("lang")) {
+                                      var langToChange;
+                                      $(".sub-menu .lang-item a").each((i, e) => {
+                                        switch (e.getAttribute("lang")) {
+                                          case "de-DE": 
+                                            langToChange = "de"
+                                            urlQuery.set("lang", langToChange)
+                                            break;
+                                  
+                                          case "fr-FR": 
+                                            langToChange = "fr"
+                                            urlQuery.set("lang", langToChange)
+                                            break;
+                                  
+                                          case "it-IT": 
+                                            langToChange = "it"
+                                            urlQuery.set("lang", langToChange)
+                                            break;
+                                  
+                                          default: 
+                                            langToChange = "en"
+                                          
+                                            urlQuery.set("lang", langToChange)
+                                            break;
+                                        }
+                                  
+                                        $(e).attr("href", location.protocol + "//" + location.host + "/" + langToChange + "/?" + urlQuery.toString())
+                                  
+                                  
+                                      });
+                                      console.log("The links in worldwide icon has been change with lang parameter");
+                                    }
+                                  }
+                                  
+                                  function updateFilters(filterValue, clickedElement) {
+                                    // Remove active class from all filter items
+                                    $('.section-general-search-filters-items > li').removeClass('active');
+                                    $('.sub-media, .sub-insights, .sub-events').removeClass('active');
+                                  
+                                    // Hide all sub-filter sections
+                                    $('.section-general-search-sub-filter-media, .section-general-search-sub-filter-insights, .section-general-search-sub-filter-events').hide();
+                                  
+                                    // Add active class to the clicked element
+                                    if (clickedElement) {
+                                      $(clickedElement).addClass('active');
+                                    }
+                                  
+                                    // Show and activate the relevant sub-filter based on the filterValue
+                                    if (filterValue === 'media') {
+                                        $('.section-general-search-sub-filter-media').show();
+                                        $('.sub-media').addClass('active');
+                                    } else if (filterValue === 'insights') {
+                                        $('.section-general-search-sub-filter-insights').show();
+                                        $('.sub-insights').addClass('active');
+                                    } else if (filterValue === 'events') {
+                                        $('.section-general-search-sub-filter-events').show();
+                                        $('.sub-events').addClass('active');
+                                    } else {
+                                        console.warn('Unknown filter:', filterValue);
+                                    }
+                                  }
+                                  
+                                  $(document).ready(function() {
+                                    //Change href in worldwide icon in search page to continuo with the lang and search terms when changed the lang with the polylang switch
+                                      changeURLWorldwide()
+                                    //End Change href in worldwide icon in search page
+                                  
+                                    //Detect if input has text inside in order to enable submit button
+                                    $('.search-for-general').on('keyup', function() {
+                                      if($('.search-for-general').val().length > 1) {
+                                        $('.search-for-general-search').prop('disabled', false);
+                                      } else {
+                                        $('.search-for-general-search').prop('disabled', true);
+                                      }
+                                    })
+                                  
+                                    $('.search-for-general').bind('keypress', function(e) {
+                                      if(e.keyCode==32) {
+                                        if($('.search-for-general').val().length == 0) {
+                                          e.preventDefault();
+                                        }
+                                      }
+                                    });  
+                                  
+                                  
+                                    //Filter by Input Search HomePage
+                                    $('#search-general-form').on('submit', function(e) {
+                                      e.preventDefault();
+                                      var parameters = searchGetParametes();
+                                  
+                                      swiftypeSearch(parameters.search, parameters.filter, parameters.subFilter, parameters.sort, parameters.langString);
+                                    });
+                                    //End Filter by Input Search HomePage
+                                  
+                                    //Filter by Input Search Result Page
+                                    $('#search-general-form.js-results').on('submit', function(e) {
+                                      e.preventDefault();
+                                      var parameters = searchGetParametes();
+                                  
+                                      swiftypeSearch(parameters.search, parameters.filter, parameters.subFilter, parameters.sort, parameters.langString);
+                                    });
+                                    //End Filter by Input Search Result Page
+                                  
+                                    //Filter by Category
+                                  
+                                    $(document).on('click', '.section-general-search-element-content-category', function() {
+                                      $('.section-general-search-filters-items:not(.sub-list)').find('li[data-post="'+$(this).data('post') +'"]').trigger('click');
+                                    });
+                                  
+                                    $('.section-general-search-filters-items > li').on('click', function() {
+                                      var parameters = searchGetParametes();
+                                      parameters.filter  = $(this).data('post');
+                                      parameters.subFilter = $(this).data('subpost');
+                                  
+                                      updateFilters(parameters.filter, this); 
+                                  
+                                      swiftypeSearch(parameters.search, parameters.filter, parameters.subFilter, parameters.sort, parameters.langString);
+                                  
+                                       $('html, body').animate({
+                                          scrollTop: $(".header-section-hero-search-page-general").offset().top - 70
+                                      }, 1000);
+                                    });
+                                    //End Filter by Category
+                                  
+                                    //Sort
+                                    $('.order-by-options').on('click', function() {
+                                      var parameters = searchGetParametes();
+                                      var button = $('#sortbyFilters');
+                                  
+                                      $('.order-by-options').removeClass('active');
+                                      $(this).addClass('active');
+                                  
+                                      if ($(this).data('sort')) {
+                                        parameters.sort = $(this).data('sort');
+                                      } else {
+                                        parameters.sort = '';
+                                      }
+                                  
+                                      swiftypeSearch(parameters.search, parameters.filter, parameters.subFilter, parameters.sort, parameters.langString);
+                                      
+                                      if ($(this).data('sort') == 'relevant') {
+                                        button.text('Most Relevant');
+                                      } else {
+                                        button.text('Most Recent');
+                                      }
+                                    })
+                                    //End Sort
+                                  
+                                    //Autocomplete
+                                    function debounce(func, wait, immediate) {
+                                        var timeout;
+                                        return function() {
+                                            var context = this, args = arguments;
+                                            var later = function() {
+                                                timeout = null;
+                                                if (!immediate) func.apply(context, args);
+                                            };
+                                            var callNow = immediate && !timeout;
+                                            clearTimeout(timeout);
+                                            timeout = setTimeout(later, wait);
+                                            if (callNow) func.apply(context, args);
+                                        };
+                                    };
+                                  
+                                    // HomePage Input
+                                    $('.swifty-form-search-input').keyup(debounce(function(e) {
+                                      var postFilter = $(this).data('category');
+                                      var string = $('.swifty-form-search-input').val();
+                                      var lang = $('.swifty-form-lang-select').val();
+                                      $('.lds-dual-ring').addClass('active');
+                                      if (string.length == 0) {
+                                        $('.swifty-form-search-autocomplete-results').hide();
+                                        $('.lds-dual-ring').removeClass('active');
+                                      } else {
+                                        $.ajax({
+                                          type: 'GET',
+                                          url: WpUtils.ajaxurl,
+                                          data: {
+                                            action: 'SearchAutocomplete',
+                                            string: string,
+                                            postFilter: postFilter,
+                                            sort_lang: lang
+                                          },
+                                          success: function(result) {
+                                            $('.swifty-form-search-autocomplete-results').show();
+                                            $('.swifty-form-search-autocomplete-results').html(result);
+                                            $('.lds-dual-ring').removeClass('active');
+                                          },
+                                          error: function(e) {
+                                            console.log(e);
+                                          }
+                                        });
+                                      }
+                                    }, 500));
+                                  
+                                    // Results page Input
+                                    var lastString = '';
+                                    $('.search-for-general').keyup(debounce(function(e) {
+                                      var string = $('.search-for-general').val().trim();
+                                      
+                                      if (string.length < 2 || string === lastString) {
+                                        $('.search-autocomplete-results-page').hide();
+                                        $('.lds-dual-ring').removeClass('active');
+                                        return; // Do not execute AJAX if less than 2 characters or if 'string' doesn't changed
+                                      }
+                                  
+                                      // Update the lastString to the current value
+                                      lastString = string;
+                                      $('.lds-dual-ring').addClass('active');
+                                  
+                                      $.ajax({
+                                        type: 'GET',
+                                        url: WpUtils.ajaxurl,
+                                        data: {
+                                          action: 'SearchPageAutocomplete',
+                                          string: string,
+                                          sort_lang: WpUtils.language
+                                        },
+                                        success: function(result) {
+                                          $('.search-autocomplete-results-page').show();
+                                          $('.search-autocomplete-results-page').html(result);
+                                          $('.lds-dual-ring').removeClass('active');
+                                        },
+                                        error: function(e) {
+                                          console.log(e);
+                                        }
+                                      });
+                                    }, 500));
+                                    //End Autocomplete
+                                  
+                                    if (window.location.search.indexOf('media') > 1) {
+                                      $('.section-general-search-sub-filter-media').show();
+                                    } else if (window.location.search.indexOf('insights') > 1) {
+                                      $('.section-general-search-sub-filter-insights').show();
+                                    } else if (window.location.search.indexOf('events') > 1) {
+                                      //$('.sub-events').addClass('active');
+                                      $('.section-general-search-sub-filter-events').show();
+                                    } else {
+                                      $('.section-general-search-sub-filter-media').hide();
+                                      $('.section-general-search-sub-filter-insights').hide();
+                                      $('.section-general-search-sub-filter-events').hide();
+                                    }
+                                  
+                                  
+                                    // Results Page Autocomplete settings
+                                     // Hide the autocomplete results when clicking outside or pressing 'Esc'
+                                      $(document).on('click', function (e) {
+                                        if (!$(e.target).closest('.search-autocomplete-results-page, .swifty-form-search-input').length) {
+                                            $('.search-autocomplete-results-page').hide();
+                                        }
+                                      });
+                                  
+                                      $(document).on('keydown', function (e) {
+                                          if (e.key === 'Escape') {
+                                              $('.search-autocomplete-results-page').hide();
+                                          }
+                                      });
+                                  
+                                    // 'More' action
+                                    $(document).on('click', '.category-link span', function (e) {
+                                      e.preventDefault();
+                                      var parameters = searchGetParametes();
+                                      parameters.filter = $(this).data('category');
+                                      var categoryOption = $(`.section-general-search-filters-items:not(.sub-list) .list-inline-item[data-post="${parameters.filter}"]`);
+                                  
+                                      $('.search-autocomplete-results-page').hide();
+                                      
+                                      updateFilters(parameters.filter, categoryOption); 
+                                      swiftypeSearch(parameters.search, parameters.filter, parameters.subFilter, parameters.sort, parameters.langString);
+                                    });
+                                  
+                                    // 'Items' Action
+                                    $(document).on('click', '.result-item.link', function (e) {
+                                      e.preventDefault();
+                                  
+                                      var categoryOption = $('.section-general-search-filters-items .list-inline-item[data-post="all"]');
+                                      var rawText = $(this).data('title');
+                                      var cleanedText = rawText.replace(/<\/?[^>]+(>|$)/g, '').trim().replace(/\s+/g, ' ');
+                                      var input = $("#search-for-general");
+                                      var parameters = searchGetParametes();
+                                      parameters.filter = 'all';
+                                      parameters.search = cleanedText;
+                                  
+                                      input.val(cleanedText);
+                                      
+                                      $('.search-autocomplete-results-page').hide();
+                                      updateFilters(parameters.filter, categoryOption); 
+                                      swiftypeSearch(parameters.search, parameters.filter, parameters.subFilter, parameters.sort, parameters.langString);
+                                    });
+                                  
+                                  });
+                                  
+                            </code>
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+            <path fill="#0F1C2E" fill-opacity="1" d="M0,128L288,192L576,224L864,160L1152,160L1440,128L1440,320L1152,320L864,320L576,320L288,320L0,320Z"></path>
+        </svg>
+
+        <section class="main-footer">
+            <footer>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12">
+                            <p class="copy">© 2025 Luis Diego</p>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </section>
+
+        <script src="/dist/vendor.bundle.js"></script>
+        <script src="/dist/custom.bundle.js"></script>
+    </body>
+</html>

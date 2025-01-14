@@ -1,0 +1,139 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Rent A Car Site</title>
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="stylesheet" href="/dist/vendor.bundle.css" />
+        <link rel="stylesheet" href="/dist/custom.bundle.css" />
+    </head>
+    <body>
+        <section class="main-banner">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 col-lg-6">
+                        <h1 data-aos="fade-up" class="main-banner-title">Generate image information</h1>
+                        <p data-aos="fade-up" class="main-banner-description">This function is designed to generate complete HTML attributes for an image, including `alt`, `width`, and `height`, based on its URL or metadata stored in WordPress</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+            <path fill="#0F1C2E" fill-opacity="1" d="M0,128L288,192L576,224L864,160L1152,160L1440,128L1440,0L1152,0L864,0L576,0L288,0L0,0Z"></path>
+        </svg>
+
+        <section class="description-project">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <h3 data-aos="fade-up">Key Features</h3>
+                        <ul data-aos="fade-up">
+                            <li><strong>URL Validation and Update:</strong> The function validates the given URL and adjusts it to match the current domain of the WordPress site.</li>
+                            <li><strong>Metadata Extraction:</strong> It retrieves metadata from the WordPress database, such as the image title, dimensions, and alternative text (alt) if available.</li>
+                            <li><strong>Alt Text Generation:</strong> If no alt text is set in WordPress, it constructs one using the image title or a cleaned version of the image file name.</li>
+                        </ul>
+                        <p data-aos="fade-up">The result is a string containing the `alt`, `width`, and `height` attributes, ready to be used in an <code>`img`</code> tag for improved accessibility and SEO. This function is particularly useful for ensuring that all images have descriptive attributes without manual editing. </p>
+
+                        <pre data-aos="fade-up">
+                            <code class="language-php">
+                                /**
+                                 * Generate alt, W and H attr for an image based on its URL or metadata.
+                                 *
+                                 * This function attempts to generate alt text for an image using the following methods:
+                                 * 1: Construct a new URL with the home domain
+                                 * 2. Get all information to the image from the metadata in WP
+                                 * 3. Validate what type of alt will be set
+                                 *
+                                 * @since 2.0.0
+                                 *
+                                 * @param string $url The URL of the image.
+                                 * @return string Alt text for the image.
+                                 */
+                                function generate_img_info($url)
+                                {
+                                    if (filter_var($url, FILTER_VALIDATE_URL)) {
+                                        // Step 1: Construct a new URL with the home domain
+                                        $parsed_url = parse_url($url);
+                                
+                                        if (!empty($parsed_url)) {
+                                            $new_domain = parse_url(home_url());
+                                            $new_image_url = $new_domain['scheme'] . "://" . $new_domain['host'] . $parsed_url['path'];
+                                            // Now $new_image_url contains the URL updated with the new domain
+                                
+                                            // Step 2: Get all information to the image from the metadata
+                                            $img_id = attachment_url_to_postid($new_image_url); // Tries to convert an attachment URL into a post ID
+                                            $img_meta_data = get_post_meta($img_id)['_wp_attachment_metadata']; // Get the image information stored in the database
+                                            $img_meta_data_uns = unserialize($img_meta_data[0]);
+                                            $img_title = $img_meta_data_uns['image_meta']['title'];
+                                            $img_w = $img_meta_data_uns['width'];
+                                            $img_h = $img_meta_data_uns['height'];
+                                            $alt_wp = get_post_meta($img_id, '_wp_attachment_image_alt', true); // Retrieve alt text from the WordPress attachment if available.
+                                            $alt = '';
+                                
+                                            // Step 3: Validate what type of alt will be set
+                                            if (!empty($alt_wp)) {
+                                                $alt = $alt_wp;
+                                            } elseif (!empty($img_title)) {
+                                                $alt = $img_title;
+                                            } else {
+                                                $img_file = $img_meta_data_uns['file'];
+                                                $img_name = pathinfo($img_file, PATHINFO_FILENAME);
+                                                $cleaned_img_name = preg_replace('/[\d-]+/', ' ', $img_name);
+                                                $final_result = ucwords(trim($cleaned_img_name));
+                                
+                                                // Set alt text based to the name of the filename
+                                                $alt = $final_result;
+                                            }
+                                
+                                            return "alt='{$alt}' width='{$img_w}' height='{$img_h}'";
+                                        } else {
+                                            return false;
+                                        }
+                                    }
+                                }
+                            </code>
+                        </pre>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        <h3 data-aos="fade-up">Preview</h3>
+
+                        <pre data-aos="fade-up">
+                            <code class="language-html">
+                                <!-- <img class="img-fluid" src="<?php echo get_sub_field('image'); ?>" <?php echo generate_img_info(get_sub_field("image")); ?> > -->
+                            </code>
+                        </pre>
+                        <p data-aos="fade-up">Result</p>
+                        <pre data-aos="fade-up">
+                            <code class="language-html">
+                                <img class="img-fluid" alt="Trending_Topics_Insights_Featured_Image_ X" width="350" height="232" src="xxx/xxx/xxx/Trending_Topics_Insights_Featured_Image_350x220.png">
+                            </code>
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+            <path fill="#0F1C2E" fill-opacity="1" d="M0,128L288,192L576,224L864,160L1152,160L1440,128L1440,320L1152,320L864,320L576,320L288,320L0,320Z"></path>
+        </svg>
+
+        <section class="main-footer">
+            <footer>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12">
+                            <p class="copy">© 2025 Luis Diego</p>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </section>
+
+        <script src="/dist/vendor.bundle.js"></script>
+        <script src="/dist/custom.bundle.js"></script>
+    </body>
+</html>

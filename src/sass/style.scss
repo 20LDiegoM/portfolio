@@ -1,0 +1,71 @@
+@use "sass:map";
+@use "variables" as vars;
+@use "mixins" as mx;
+@use "./home.scss";
+@use "./legal.scss";
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: vars.$gray-bg;
+    color: #333;
+}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    @include mx.title;
+}
+
+p,
+li {
+    @include mx.text;
+    margin-bottom: 15px;
+}
+
+@each $header, $styles in vars.$font-styles {
+    #{$header} {
+        @include mx.responsive-header-style(map.get($styles, desktop));
+
+        @media (max-width: 1024px) {
+            @include mx.responsive-header-style(map.get($styles, tablet));
+        }
+
+        @media (max-width: 768px) {
+            @include mx.responsive-header-style(map.get($styles, mobile));
+        }
+    }
+}
+
+p,
+li,
+span,
+a {
+    @include mx.responsive-text-style(map.get(vars.$text-styles, desktop));
+
+    @media (max-width: 1024px) {
+        @include mx.responsive-text-style(map.get(vars.$text-styles, tablet));
+    }
+
+    @media (max-width: 768px) {
+        @include mx.responsive-text-style(map.get(vars.$text-styles, mobile));
+    }
+}
+
+.language-php,
+.language-html,
+.language-js {
+    span {
+        font-size: initial;
+        line-height: initial;
+    }
+}

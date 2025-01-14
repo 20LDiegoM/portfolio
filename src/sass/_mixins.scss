@@ -1,0 +1,31 @@
+@use "sass:map";
+@mixin flex-center {
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+@mixin title {
+    font-family: "Playfair Display", serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+}
+
+@mixin text {
+    font-family: "Playfair Display", serif;
+    font-optical-sizing: auto;
+    font-weight: 200;
+    font-style: normal;
+}
+
+@mixin responsive-header-style($styles) {
+    font-size: map.get($styles, font-size);
+    line-height: map.get($styles, line-height);
+    margin-bottom: map.get($styles, margin-bottom);
+}
+
+@mixin responsive-text-style($styles) {
+    font-size: map.get($styles, font-size);
+    line-height: map.get($styles, line-height);
+}

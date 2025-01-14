@@ -1,0 +1,327 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Rent A Car Site</title>
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="stylesheet" href="/dist/vendor.bundle.css" />
+        <link rel="stylesheet" href="/dist/custom.bundle.css" />
+    </head>
+    <body>
+        <section class="main-banner">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 col-lg-6">
+                        <h1 data-aos="fade-up" class="main-banner-title">Rent a Car Site.</h1>
+                        <p data-aos="fade-up" class="main-banner-description">Developed and maintained a responsive website showcasing car rental services and vehicle listings.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+            <path fill="#0F1C2E" fill-opacity="1" d="M0,128L288,192L576,224L864,160L1152,160L1440,128L1440,0L1152,0L864,0L576,0L288,0L0,0Z"></path>
+        </svg>
+
+        <section class="description-project">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <h2 data-aos="fade-up">Custom Theme</h2>
+                        <p data-aos="fade-up">This is a theme based on the client's requirements.</p>
+                        <p data-aos="fade-up">In this project, Vanilla JS and Gutenberg Blocks were implemented.</p>
+
+                        <p data-aos="fade-up">This code manages the declaration of multiple Custom Post Types (CPTs) in WordPress, allowing the site to handle custom content effectively.</p>
+                        <p data-aos="fade-up">This modular approach is ideal for maintaining scalability and organization in complex projects, separating the logic of Custom Post Types into individual files for better maintenance.</p>
+
+                        <pre data-aos="fade-up">
+                            <code class="language-php">
+                                /**
+                                *
+                                * Custom Post Types Declaration
+                                *
+                                */
+
+                                $post_type_includes = [
+                                    'inc/post-types/locations.php',
+                                    'inc/post-types/reservations.php',
+                                    'inc/post-types/vehicle.php',
+                                    'inc/post-types/discounts.php',
+                                ];
+
+                                foreach ($post_type_includes as $file) {
+                                    if (!$filepath = locate_template($file)) {
+                                        trigger_error(sprintf(__('Error locating %s for inclusion', 'ws'), $file), E_USER_ERROR);
+                                    }
+                                    require_once $filepath;
+                                }
+                            </code>
+
+                        </pre>
+
+                        <p data-aos="fade-up">This code defines a Custom Post Type (CPT) called "location" in WordPress. This content type allows for structured and customized management of locations within the site's admin area.</p>
+
+                        <pre data-aos="fade-up">
+                            <code class="language-php">
+                                function create_location_post_type()
+                                {
+                                /**
+                                * Post Type: Location.
+                                */
+
+                                register_post_type(
+                                    'location',
+                                    array(
+                                    'labels' => array(
+                                        'name' => 'Locations',
+                                        'menu_name' => 'Locations',
+                                        'all_items' => 'Locations',
+                                        'singular_name' => 'Location',
+                                        'add_new' => 'New Location',
+                                        'add_new_item' => 'Add New Location'
+                                    ),
+                                    'public' => false,
+                                    'publicly_queryable' => true,
+                                    'show_ui' => true,
+                                    'exclude_from_search' => true,
+                                    'show_in_nav_menus' => false,
+                                    'has_archive' => false,
+                                    'rewrite' => array('slug' => 'location'),
+                                    'taxonomies' => array(''),
+                                    'menu_icon' => 'dashicons-location',
+                                    'hiercarchical' => true,
+                                    'supports' => array('title', 'author')
+                                    )
+                                );
+                                }
+
+                                add_action('init', 'create_location_post_type');
+                            </code>
+                        </pre>
+
+                        <p data-aos="fade-up">This code extends the functionality of the Gutenberg editor in WordPress by creating custom blocks and configuring their visibility.</p>
+                        <p data-aos="fade-up">This approach is ideal for projects that require custom blocks and stricter control over the available options in the editor, ensuring an optimized user experience tailored to the site's needs.</p>
+
+                        <pre data-aos="fade-up">
+                            <code class="language-php">
+                                /**
+                                *
+                                * Gutenberg Editor - Custom Blocks
+                                *
+                                */
+
+                                // Create Custom Blocks Category
+                                function custom_block_category( $categories, $post ) {
+                                    return array_merge(
+                                        $categories,
+                                        array(
+                                            array(
+                                                'slug' => THEME_FOLDER . '-blocks',
+                                                'title' => __( APP_NAME .' Blocks', THEME_FOLDER . '-blocks' ),
+                                            ),
+                                        )
+                                    );
+                                }
+                                add_filter( 'block_categories', 'custom_block_category', 10, 2);
+
+                                // Register Blocks
+                                function register_acf_block_types(){
+                                    if ( function_exists('acf_register_block') ) {
+                                        // Hero Block
+                                        acf_register_block_type(
+                                            array(
+                                                'name'              => 'hero-block',
+                                                'title'             => 'Hero',
+                                                'description'       => 'Hero Block',
+                                                'category'          => THEME_FOLDER . '-blocks',
+                                                'icon'              => 'format-image',
+                                                'keywords'          => array('block', 'custom', 'hero'),
+                                                'render_template'   => '/resourses/blocks/hero-block.php',
+                                                'mode' => 'edit', // Force Edit Mode
+                                            )
+                                        );
+
+                                        // Subscribe Block
+                                        acf_register_block_type(
+                                            array(
+                                                'name'              => 'subscribe-block',
+                                                'title'             => 'Subscribe',
+                                                'description'       => 'Subscribe Block',
+                                                'category'          => THEME_FOLDER . '-blocks',
+                                                'icon'              => 'share',
+                                                'keywords'          => array('block', 'custom', 'subscribe' ),
+                                                'render_template'   => '/resourses/blocks/subscribe-block.php',
+                                                'mode' => 'edit', // Force Edit Mode
+                                            )
+                                        );
+
+                                        // Campaign Block
+                                        acf_register_block_type(
+                                            array(
+                                                'name'              => 'campaign-block',
+                                                'title'             => 'Campaign',
+                                                'description'       => 'Campaign Block',
+                                                'category'          => THEME_FOLDER . '-blocks',
+                                                'icon'              => 'embed-post',
+                                                'keywords'          => array('block', 'custom', 'campaign', 'posts'),
+                                                'render_template'   => '/resourses/blocks/campaign-block.php',
+                                                'mode' => 'edit', // Force Edit Mode
+                                            )
+                                        );
+                                    }
+                                }
+
+                                add_action('init', 'register_acf_block_types');
+
+
+                                // Hide most of the default blocks
+                                function filter_allowed_block_types($allowed_blocks)
+                                {
+                                    $custom_blocks_category = THEME_FOLDER . '-blocks';
+                                    
+                                    $allowed_blocks = [
+                                        $custom_blocks_category,
+                                        "acf/campaign-block",
+                                        'acf/hero-block',
+                                        'acf/subscribe-block',
+                                    ];
+
+                                    return $allowed_blocks;
+                                }
+
+                                add_filter('allowed_block_types', 'filter_allowed_block_types');
+                            </code>
+                        </pre>
+
+                        <p data-aos="fade-up">This code defines a custom template for a Hero Block in WordPress, designed to integrate with the Gutenberg editor and manage dynamic content.</p>
+                        <pre data-aos="fade-up">
+                            <code class="language-php">
+                                /**
+                                * Hero Block Template.
+                                */
+
+                                $section_name = get_field('section_name');
+                                $hero_image = get_field('hero_image');
+                            </code>
+                        </pre>
+
+                        <pre data-aos="fade-up">
+                            <code class="language-html">
+                                <section class="hero" id="<?php sanitize_title($section_name) ?>">
+                                    <?php
+                                    set_query_var('image', $hero_image);
+                                    get_template_part('resourses/components/lazy-image');
+                                    ?>
+                                </section>
+                            </code>
+                        </pre>
+
+                        <p data-aos="fade-up">This code defines a custom template for a Subscribe Block in WordPress, designed to capture user subscriptions and provide dynamic content.</p>
+
+                        <pre data-aos="fade-up">
+                            <code class="language-php">
+                                /**
+                                * Subscribe Block Template.
+                                */
+                                $section_name = get_field('section_name');
+                                $heading = get_field('heading');
+                                $copy = get_field('copy');
+                            </code>
+                        </pre>
+
+                        <pre data-aos="fade-up">
+                            <code class="language-html">
+                                <section class="subscribe" id="<?php sanitize_title($section_name) ?>">
+                                    <div class="subscribe__inner container">
+                                        <?php if (!empty($heading)) : ?>
+                                        <h2 class="subscribe__heading">
+                                            <?php $heading ?>
+                                        </h2>
+                                        <?php endif ?>
+                                        <?php if (!empty($copy)) : ?>
+                                        <div class="subscribe__copy">
+                                            <?php $copy ?>
+                                        </div>
+                                        <?php endif ?>
+                                        <div class="subscribe__form">
+                                        <?php do_shortcode('[mc4wp_form id="329"]'); ?>
+                                        </div>
+                                    </div>
+                                </section>
+                            </code>
+                        </pre>
+
+                        <p data-aos="fade-up">This code implements a block template called "Features Grid" for a WordPress theme. It is designed to display a grid of features with a structured and dynamic layout. The content is managed through ACF (Advanced Custom Fields), allowing administrators to easily customize the block from the WordPress admin panel.</p>
+
+                        <pre data-aos="fade-up">
+                            <code class="language-php">
+                                /**
+                                * Features Grid Block Template.
+                                */
+                               $section_name = get_field('section_name');
+                               $heading = get_field('heading');
+                               $features = get_field('features');
+                            </code>
+                        </pre>
+
+                        <pre data-aos="fade-up">
+                            <code class="language-html">
+                                <section class="features-grid" id="<?= sanitize_title($section_name) ?>">
+                                    <div class="features-grid__inner container">
+                                      <?php if (!empty($heading)) : ?>
+                                        <h2 class="features-grid__title text-center">
+                                          <?= $heading ?>
+                                        </h2>
+                                      <?php endif; ?>
+                                      <?php if (!empty($features)) : ?>
+                                        <div class="row features-grid__features">
+                                          <?php foreach ($features as $feature) : ?>
+                                            <div class="col-12 col-md-6 col-lg-4 py-4">
+                                              <div class="features-grid__card">
+                                                <div class="features-grid__card-icon">
+                                                  <?php icon($feature['icon'], 35, 35) ?>
+                                                </div>
+                                                <div class="features-grid__card-content">
+                                                  <div class="h3 features-grid__card-title">
+                                                    <?= $feature['feature_name'] ?>
+                                                  </div>
+                                                  <div class="features-grid__card-copy">
+                                                    <?php if (!empty($feature['feature_description'])) : ?>
+                                                      <?= $feature['feature_description'] ?>
+                                                    <?php endif ?>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          <?php endforeach ?>
+                                        </div>
+                                      <?php endif ?>
+                                    </div>
+                                  </section>
+                            </code>
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+            <path fill="#0F1C2E" fill-opacity="1" d="M0,128L288,192L576,224L864,160L1152,160L1440,128L1440,320L1152,320L864,320L576,320L288,320L0,320Z"></path>
+        </svg>
+
+        <section class="main-footer">
+            <footer>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12">
+                            <p class="copy">© 2025 Luis Diego</p>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </section>
+
+        <script src="/dist/vendor.bundle.js"></script>
+        <script src="/dist/custom.bundle.js"></script>
+    </body>
+</html>
